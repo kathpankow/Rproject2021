@@ -63,6 +63,10 @@ dataSummary <- function(file){
   nMale <- 0
   nFemale <- 0
   for(n in 1:nrow(data))
+  #age distribution - distribution of ages screened 
+  for(n in 1:nrow(data)){
+    print()
+  }#end loop for age
     #return statement
     returns <- list("number of screens" = nscreens, "percent infected" = percentInfected)
   return(returns)
