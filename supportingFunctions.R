@@ -12,7 +12,24 @@ csvConvert("countryY")
 csvCompile <- function(dir, outputfile, rmNA = TRUE, warnNA = TRUE){
   #list all .csv files in directory
   list <- list.files(dir, pattern = "*.csv")
-  for(n in 1:length(list)){
+  #do file 1 with headers
+  table <- read.table(paste(dir, list[1], sep = "/"), header = TRUE, sep = ",", stringsAsFactors = FALSE)
+  table$country <- rep(substr(dir, start = 7, stop = 7), times = nrow(table))
+  dayofYear <- as.numeric(substr(list[1], start = 8, stop = 10))
+  table$dayofYear <- rep(dayofYear, times = nrow(table))
+  if(rmNA == TRUE){
+    for(n in 1:nrow(table)){
+      if(anyNA(table[n,]) == TRUE){
+        table <- table[-c(n),]
+      }
+    }
+  }else if(warnNA == TRUE){ #warn for NA values if warnNA is set to TRUE
+    if(anyNA(table) == TRUE){
+      print("Warning: Some rows in compiled data contain NA values.")
+    }
+  }
+  #without headers
+  for(n in 2:length(list)){
     #read file
     table <- read.table(paste(dir, list[n], sep = "/"), header = TRUE, sep = ",", stringsAsFactors = FALSE)
     #add country column
