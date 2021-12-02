@@ -6,7 +6,6 @@ csvConvert <- function(dir){ #fileN includes path
     write.csv(table, file = paste(dir, "/", substr(list[n],1,nchar(list[n])-4),".csv", sep = ""), row.names = FALSE)
   }
 }
-csvConvert("countryY")
 
 #compile data from all .csv files in a directory into a single .csv file
 csvCompile <- function(dir, outputfile, rmNA = TRUE, warnNA = TRUE){
@@ -55,7 +54,6 @@ csvCompile <- function(dir, outputfile, rmNA = TRUE, warnNA = TRUE){
   }
   write.table(compiled, file = outputfile, sep = ",", row.names = FALSE)
 }
-csvCompile("countryX", "test.csv")
 
 #summarize the compiled data set in terms of: 
 #number of screens run 
@@ -67,19 +65,30 @@ dataSummary <- function(file){
   #number of screens run
   nscreens <- nrow(data)
   #percent of patients screened that were infected
-  ninfected <- 0
+  nInfected <- 0
   for(n in 1:nrow(data)){
     if(is.element(1, data[n,3:12]) == TRUE){
-      ninfected <- ninfected + 1
+      nInfected <- nInfected + 1
     }
   }
-  percentInfected <- ninfected / nscreens * 100
+  percentInfected <- nInfected / nscreens * 100
   #male vs. female patients
   nMale <- 0
   nFemale <- 0
-  for(n in 1:nrow(data))
-    #return statement
-    returns <- list("number of screens" = nscreens, "percent infected" = percentInfected)
+  for(n in 1:nrow(data)){
+    if(is.element(1, data[n,3:12]) == TRUE){
+      if(data[n,1] == "male"){
+        nMale <- nMale + 1
+      }else{
+        nFemale <- nFemale + 1
+      }
+    }
+  }
+  pMale <- nMale / nInfected * 100
+  pFemale <- nFemale / nInfected * 100
+  #age distribution of patients
+  ageDist <- summary(data$age)
+  #return statement
+  returns <- list("number of screens" = nscreens, "percent infected" = percentInfected, "percent of infected that are male" = pMale, "percent of infected that are female" = pFemale, "age distribution of all patients" = ageDist)
   return(returns)
 }
-dataSummary("allData.csv")
