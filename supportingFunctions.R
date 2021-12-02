@@ -12,15 +12,18 @@ csvConvert("countryY")
 csvCompile <- function(dir, outputfile, rmNA = TRUE, warnNA = TRUE){
   #list all .csv files in directory
   list <- list.files(dir, pattern = "*.csv")
-  #do file 1 with headers
-  table <- read.table(paste(dir, list[1], sep = "/"), header = TRUE, sep = ",", stringsAsFactors = FALSE)
-  table$country <- rep(substr(dir, start = 7, stop = 7), times = nrow(table))
+  #create initial table
+  compiled <- read.table(paste(dir, list[1], sep = "/"), header = TRUE, sep = ",", stringsAsFactors = FALSE)
+  #add country column
+  compiled$country <- rep(substr(dir, start = 8, stop = 8), times = nrow(compiled))
+  #add dayofYear column
   dayofYear <- as.numeric(substr(list[1], start = 8, stop = 10))
-  table$dayofYear <- rep(dayofYear, times = nrow(table))
+  compiled$dayofYear <- rep(dayofYear, times = nrow(compiled))
+  #remove rows with NA if rmNA is set to TRUE
   if(rmNA == TRUE){
-    for(n in 1:nrow(table)){
-      if(anyNA(table[n,]) == TRUE){
-        table <- table[-c(n),]
+    for(n in 1:nrow(compiled)){
+      if(anyNA(compiled[n,]) == TRUE){
+        compiled <- compiled[-c(n),]
       }
     }
   }else if(warnNA == TRUE){ #warn for NA values if warnNA is set to TRUE
@@ -28,12 +31,11 @@ csvCompile <- function(dir, outputfile, rmNA = TRUE, warnNA = TRUE){
       print("Warning: Some rows in compiled data contain NA values.")
     }
   }
-  #without headers
   for(n in 2:length(list)){
     #read file
     table <- read.table(paste(dir, list[n], sep = "/"), header = TRUE, sep = ",", stringsAsFactors = FALSE)
     #add country column
-    table$country <- rep(substr(dir, start = 7, stop = 7), times = nrow(table))
+    table$country <- rep(substr(dir, start = 8, stop = 8), times = nrow(table))
     #add dayofYear column
     dayofYear <- as.numeric(substr(list[n], start = 8, stop = 10))
     table$dayofYear <- rep(dayofYear, times = nrow(table))
@@ -49,13 +51,9 @@ csvCompile <- function(dir, outputfile, rmNA = TRUE, warnNA = TRUE){
         print("Warning: Some rows in compiled data contain NA values.")
       }
     }
-    #add table to output file (headers are only added once at the beginning)
-    if(n == 1){
-      write.table(table, file = outputfile, append = TRUE, sep = ",", row.names = FALSE, col.names = TRUE)
-    }else{
-      write.table(table, file = outputfile, append = TRUE, sep = ",", row.names = FALSE, col.names = FALSE)
-    }
+    compiled <- rbind(compiled,table)
   }
+  write.table(compiled, file = outputfile, sep = ",", row.names = FALSE)
 }
 csvCompile("countryX", "test.csv")
 
