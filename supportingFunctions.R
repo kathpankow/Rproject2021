@@ -1,5 +1,5 @@
 #convert .txt files with different delimiters into .csv files
-csvConvert <- function(dir){ #fileN includes path
+csvConvert <- function(dir){ 
   list <- list.files(dir, pattern = "*.txt")
   for(n in 1:length(list)){
     table <- read.table(paste(dir, list[n], sep = "/"), header = TRUE, sep = "")
@@ -52,7 +52,7 @@ csvCompile <- function(dir, outputfile, rmNA = TRUE, warnNA = TRUE){
     }
     compiled <- rbind(compiled,table)
   }
-  write.table(compiled, file = outputfile, sep = ",", row.names = FALSE)
+  write.csv(compiled, file = outputfile, row.names = FALSE)
 }
 
 #summarize the compiled data set in terms of: 
