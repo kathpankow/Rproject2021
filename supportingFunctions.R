@@ -30,7 +30,7 @@ csvCompile <- function(dir, outputfile, rmNA = TRUE, warnNA = TRUE){  #"dir" is 
       print("Warning: Some rows in compiled data contain NA values.")
     }
   }
-  ##COMMENT HERE?
+  #Start at 2nd file in list because the first file is already loaded into "compiled" variable
   for(n in 2:length(list)){
     #Read file
     table <- read.table(paste(dir, list[n], sep = "/"), header = TRUE, sep = ",", stringsAsFactors = FALSE)
