@@ -1,11 +1,11 @@
-#load ggplot and cowplot
+#Load ggplot and cowplot
 library(ggplot2)
 library(cowplot)
 
-#use source() to load functions defined in supportingFunctions.R
+#Use source() to load functions defined in supportingFunctions.R
 source("supportingFunctions.R")
 
-#compile all data into a single .csv file
+#Compile all data into a single .csv file
 csvConvert("countryY")
 csvCompile("countryX", outputfile = "Xcompiled.csv")
 csvCompile("countryY", outputfile = "Ycompiled.csv")
@@ -14,11 +14,11 @@ Ycompiled <- read.csv("Ycompiled.csv", header = TRUE, stringsAsFactors = FALSE)
 allData <- rbind(Xcompiled, Ycompiled)
 write.table(allData, file = "allCompiled.csv", sep = ",", row.names = FALSE)
 
-###in which country did the outbreak likely begin?
-#create empty dataframe for each country (dayofyear vs ninfected)
+###In which country did the outbreak likely begin?
+#Create empty dataframe for each country (dayofyear vs. ninfected)
 countryXoutbreak <- data.frame(dayofYear = 120:175, nInfected = rep(NA, times = 176-120))
 countryYoutbreak <- data.frame(dayofYear = 120:175, nInfected = rep(NA, times = 176-120))
-#fill countryXoutbreak table
+#Fill countryXoutbreak table
 row <- 1
 for(m in 120:175){
   nInfectedX <- 0
@@ -32,7 +32,7 @@ for(m in 120:175){
   countryXoutbreak[row,2] <- nInfectedX
   row <- row + 1
 }
-#fill countryYoutbreak table
+#Fill countryYoutbreak table
 row <- 1
 for(m in 120:175){
   nInfectedY <- 0
@@ -46,14 +46,14 @@ for(m in 120:175){
   countryYoutbreak[row,2] <- nInfectedY
   row <- row + 1
 }
-#create scatterplot for country X
+#Create scatter plot for country X. The scatter plot will graph day of year vs. number of infected patients
 ggplot(data = countryXoutbreak, aes(x = dayofYear, y = nInfected)) +
   geom_point() +
   ggtitle("Country X - Cases vs. Date") +
   xlab("Day of Year") +
   ylab("Number of Cases") +
   theme_classic()
-#create scatterplot for country Y
+#Create scatter plot for country Y. The scatter plot will graph day of year vs. number of infected patients
 ggplot(data = countryYoutbreak, aes(x = dayofYear, y = nInfected)) +
   geom_point() +
   ggtitle("Country Y - Cases vs. Date") +
@@ -61,35 +61,41 @@ ggplot(data = countryYoutbreak, aes(x = dayofYear, y = nInfected)) +
   ylab("Number of Cases") +
   theme_classic()
 
-###if country Y develops a vaccine, would it work in country X?
-#make empty dataframe for each country
+##The disease outbreak likely began in Country X. This is supported by the scatter plots which show that Country X had many cases early in the year, while country Y had very little cases earlier in the year. 
+
+###If country Y develops a vaccine for the disease, would it work in country X?
+#Make empty dataframe for each country
 countryXmarkers <- data.frame(marker = 1:10, count = rep(NA, times = 10))
 countryYmarkers <- data.frame(marker = 1:10, count = rep(NA, times = 10))
-#marker counts for country X
+#Marker counts for country X
 rowX <- 1
 for(i in 3:12){
   total <- sum(Xcompiled[,i])
   countryXmarkers[rowX,2] <- total
   rowX <- rowX + 1
 }
-#marker counts for country Y
+#Marker counts for country Y
 rowY <- 1
 for(i in 3:12){
   total <- sum(Ycompiled[,i])
   countryYmarkers[rowY,2] <- total
   rowY <- rowY + 1
 }
-#bar plot for country X
+#Bar plot for country X. The graph shows the number of times each marker shows up among the patients. 
 ggplot(data = countryXmarkers, aes(x = as.factor(marker), y = count)) +
   geom_bar(stat = "identity") +
   xlab("Marker") +
   ylab("Count") +
   ggtitle("Appearances of Each Marker in Country X") +
   theme_classic()
-#bar plot for country Y
+#Bar plot for country Y. The graph shows the number of times each marker shows up among the patients.
 ggplot(data = countryYmarkers, aes(x = as.factor(marker), y = count)) +
   geom_bar(stat = "identity") +
   xlab("Marker") +
   ylab("Count") +
   ggtitle("Appearances of Each Marker in Country Y") +
   theme_classic()
+
+##A vaccine for country Y will not work for citizens in country X. 
+#This is because the patient's in the two countries have very different markers. 
+#Country X citizens mainly display markers 1-5 and very little of 6-10. Country Y citizens display markers 6 and 7 to a great extent as well as markers 8-10. 

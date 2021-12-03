@@ -1,5 +1,5 @@
-#convert .txt files with different delimiters into .csv files
-csvConvert <- function(dir){ #fileN includes path
+#Custom function to convert .txt files into .csv files
+csvConvert <- function(dir){    #"dir" is the directory
   list <- list.files(dir, pattern = "*.txt")
   for(n in 1:length(list)){
     table <- read.table(paste(dir, list[n], sep = "/"), header = TRUE, sep = "")
@@ -7,38 +7,39 @@ csvConvert <- function(dir){ #fileN includes path
   }
 }
 
-#compile data from all .csv files in a directory into a single .csv file
-csvCompile <- function(dir, outputfile, rmNA = TRUE, warnNA = TRUE){
-  #list all .csv files in directory
+#Custom function to compile data from all .csv files in a directory into a single .csv file
+csvCompile <- function(dir, outputfile, rmNA = TRUE, warnNA = TRUE){  #"dir" is the directory of interest, "outputfile" is the name of the compiled file you want to make  #"rmNA" is whether you want to keep rows with NA #"warnNA" is whether you want to be warned of NAs
+  #List all the .csv files in a directory
   list <- list.files(dir, pattern = "*.csv")
-  #create initial table
+  #Create initial table
   compiled <- read.table(paste(dir, list[1], sep = "/"), header = TRUE, sep = ",", stringsAsFactors = FALSE)
-  #add country column
+  #Add country column
   compiled$country <- rep(substr(dir, start = 8, stop = 8), times = nrow(compiled))
-  #add dayofYear column
+  #Add dayofYear column
   dayofYear <- as.numeric(substr(list[1], start = 8, stop = 10))
   compiled$dayofYear <- rep(dayofYear, times = nrow(compiled))
-  #remove rows with NA if rmNA is set to TRUE
+  #Remove rows with NA if rmNA is set to TRUE
   if(rmNA == TRUE){
     for(n in 1:nrow(compiled)){
       if(anyNA(compiled[n,]) == TRUE){
         compiled <- compiled[-c(n),]
       }
     }
-  }else if(warnNA == TRUE){ #warn for NA values if warnNA is set to TRUE
+  }else if(warnNA == TRUE){   #warn for NA values if warnNA is set to TRUE
     if(anyNA(table) == TRUE){
       print("Warning: Some rows in compiled data contain NA values.")
     }
   }
+  ##COMMENT HERE?
   for(n in 2:length(list)){
-    #read file
+    #Read file
     table <- read.table(paste(dir, list[n], sep = "/"), header = TRUE, sep = ",", stringsAsFactors = FALSE)
-    #add country column
+    #Add country column
     table$country <- rep(substr(dir, start = 8, stop = 8), times = nrow(table))
-    #add dayofYear column
+    #Add dayofYear column
     dayofYear <- as.numeric(substr(list[n], start = 8, stop = 10))
     table$dayofYear <- rep(dayofYear, times = nrow(table))
-    #remove rows with NA if rmNA is set to TRUE
+    #Remove rows with NA if rmNA is set to TRUE
     if(rmNA == TRUE){
       for(n in 1:nrow(table)){
         if(anyNA(table[n,]) == TRUE){
@@ -50,21 +51,24 @@ csvCompile <- function(dir, outputfile, rmNA = TRUE, warnNA = TRUE){
         print("Warning: Some rows in compiled data contain NA values.")
       }
     }
+    #Compiled data 
     compiled <- rbind(compiled,table)
   }
-  write.table(compiled, file = outputfile, sep = ",", row.names = FALSE)
+  #Writing file that contains the compiled data
+  write.csv(compiled, file = outputfile, row.names = FALSE)
 }
 
-#summarize the compiled data set in terms of: 
+#Custom function to summarize the compiled data set in terms of: 
 #number of screens run 
 #percent of patients screened that were infected 
-#male vs. female patients
-#age distribution of patients
-dataSummary <- function(file){
+#male vs. female patients: percent of infected patients that are male and percent of infected patients that are female
+#age distribution of patients: age distribution of all patients
+dataSummary <- function(file){     #"file" is the file name
+  #Load data 
   data <- read.table(file, header = TRUE, sep = ",", stringsAsFactors = FALSE)
-  #number of screens run
+  #Number of screens run
   nscreens <- nrow(data)
-  #percent of patients screened that were infected
+  #Percent of patients screened that were infected
   nInfected <- 0
   for(n in 1:nrow(data)){
     if(is.element(1, data[n,3:12]) == TRUE){
@@ -72,7 +76,7 @@ dataSummary <- function(file){
     }
   }
   percentInfected <- nInfected / nscreens * 100
-  #male vs. female patients
+  #Male vs. female patients
   nMale <- 0
   nFemale <- 0
   for(n in 1:nrow(data)){
@@ -86,9 +90,9 @@ dataSummary <- function(file){
   }
   pMale <- nMale / nInfected * 100
   pFemale <- nFemale / nInfected * 100
-  #age distribution of patients
+  #Age distribution of patients
   ageDist <- summary(data$age)
   #return statement
-  returns <- list("number of screens" = nscreens, "percent infected" = percentInfected, "percent of infected that are male" = pMale, "percent of infected that are female" = pFemale, "age distribution of all patients" = ageDist)
+  returns <- list("Number of screens run:" = nscreens, "Percent infected" = percentInfected, "Percent of infected patients that are male" = pMale, "Percent of infected patients that are female" = pFemale, "Age distribution of all patients" = ageDist)
   return(returns)
 }
