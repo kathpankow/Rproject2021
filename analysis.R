@@ -98,4 +98,5 @@ ggplot(data = countryYmarkers, aes(x = as.factor(marker), y = count)) +
 
 ##A vaccine for country Y will not work for citizens in country X. 
 #This is because the patient's in the two countries have very different markers. 
-#Country X citizens mainly display markers 1-5 and very little of 6-10. Country Y citizens display markers 6 and 7 to a great extent as well as markers 8-10. 
+#Country X citizens mainly display markers 1-5 and very little of 6-10. Country Y citizens display markers 6 and 7 to a great extent as well as markers 8-10.
+#This means the disease (bacteria) likely underwent mutations between Country X and Country Y. 
